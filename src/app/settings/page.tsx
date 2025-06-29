@@ -1,50 +1,138 @@
 'use client';
 
-import { AppLayout } from '@/components/app-layout';
-import { ParkingDetailsForm } from '@/components/parking-details-form';
-import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
-import type { parkingDetailsSchema } from '@/lib/schemas';
 
-type ParkingDetailsFormValues = z.infer<typeof parkingDetailsSchema>;
+import { AppLayout } from '@/components/app-layout';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { userProfileSchema } from '@/lib/schemas';
+import { Separator } from '@/components/ui/separator';
+
+type UserProfileFormValues = z.infer<typeof userProfileSchema>;
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const router = useRouter();
 
-  const handleSaveChanges = (data: ParkingDetailsFormValues) => {
-    console.log('Saving changes:', data);
+  const form = useForm<UserProfileFormValues>({
+    resolver: zodResolver(userProfileSchema),
+    defaultValues: {
+      name: 'Parking Manager',
+      email: 'owner@example.com',
+    },
+  });
+
+  const handleSaveChanges = (data: UserProfileFormValues) => {
+    console.log('Saving profile changes:', data);
     toast({
-      title: 'Settings Saved!',
-      description: 'Your parking space details have been updated successfully.',
+      title: 'Profile Updated!',
+      description: 'Your profile details have been saved.',
     });
   };
-
-  const mockDefaultValues = {
-    name: 'City Center Parking',
-    location: '123 Main St, Kathmandu, Nepal',
-    openingTime: '08:00',
-    closingTime: '22:00',
-    googleMapsLink: 'https://maps.app.goo.gl/example',
-    facilities: 'CCTV Surveillance, 24/7 Security Guards, Covered Parking, Fire Safety',
-    amenities: 'Public Restroom, Car Wash Service, EV Charging Station, Waiting Lounge',
+  
+  const handleLogout = () => {
+    toast({
+      title: 'Logged Out',
+      description: 'You have been successfully logged out.',
+    });
+    router.push('/');
   };
 
   return (
     <AppLayout>
-      <div className="flex flex-col gap-8">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline">Parking Space Settings</h1>
+          <h1 className="text-3xl font-bold font-headline">Settings</h1>
           <p className="text-muted-foreground">
-            Update the details of your parking space. Changes will be reflected for all users.
+            Manage your account and profile settings.
           </p>
         </div>
-        <div className="max-w-4xl">
-          <ParkingDetailsForm
-            onSubmit={handleSaveChanges}
-            defaultValues={mockDefaultValues}
-            buttonText="Save Changes"
-          />
-        </div>
+        
+        <Card className="max-w-2xl">
+          <CardHeader>
+            <CardTitle>Profile</CardTitle>
+            <CardDescription>Update your personal information.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSaveChanges)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="your@email.com" {...field} readOnly disabled />
+                      </FormControl>
+                      <FormDescription>
+                        Your email address cannot be changed.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit">Save Changes</Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
+        <Card className="max-w-2xl">
+          <CardHeader>
+            <CardTitle>Security</CardTitle>
+            <CardDescription>Manage your password and session.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+             <div>
+                <Label>Password</Label>
+                <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground text-sm">For security, you can change your password.</p>
+                    <Button variant="outline">Change Password</Button>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <Label>Log Out</Label>
+                <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground text-sm">End your current session on this device.</p>
+                    <Button variant="destructive" onClick={handleLogout}>Log Out</Button>
+                </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AppLayout>
   );

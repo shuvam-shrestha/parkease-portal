@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { Building, LayoutDashboard, Settings } from 'lucide-react';
 
 import {
   SidebarContent,
@@ -30,6 +30,16 @@ export function AppSidebar() {
             >
               <LayoutDashboard />
               <span>Dashboard</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              href="/parking-management"
+              isActive={pathname === '/parking-management'}
+              tooltip="Parking Management"
+            >
+              <Building />
+              <span>Parking Management</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

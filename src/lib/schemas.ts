@@ -9,3 +9,8 @@ export const parkingDetailsSchema = z.object({
   facilities: z.string().min(10, { message: 'Please list some facilities.' }),
   amenities: z.string().min(10, { message: 'Please list some amenities.' }),
 });
+
+export const userProfileSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
+});
