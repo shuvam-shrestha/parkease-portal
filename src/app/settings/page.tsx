@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -11,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -27,14 +25,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { userProfileSchema } from '@/lib/schemas';
-import { Separator } from '@/components/ui/separator';
-import { Label } from '@/components/ui/label';
 
 type UserProfileFormValues = z.infer<typeof userProfileSchema>;
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
@@ -50,14 +45,6 @@ export default function SettingsPage() {
       title: 'Profile Updated!',
       description: 'Your profile details have been saved.',
     });
-  };
-  
-  const handleLogout = () => {
-    toast({
-      title: 'Logged Out',
-      description: 'You have been successfully logged out.',
-    });
-    router.push('/');
   };
 
   return (
@@ -117,22 +104,13 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Security</CardTitle>
-                <CardDescription>Manage your password and session.</CardDescription>
+                <CardDescription>Manage your password.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                  <div>
-                    <Label className="font-semibold">Password</Label>
                     <div className="flex items-center justify-between mt-2">
                         <p className="text-muted-foreground text-sm">For security, you can change your password.</p>
                         <Button variant="outline">Change Password</Button>
-                    </div>
-                </div>
-                <Separator />
-                <div>
-                    <Label className="font-semibold text-destructive">Log Out</Label>
-                    <div className="flex items-center justify-between mt-2">
-                        <p className="text-muted-foreground text-sm">End your current session on this device.</p>
-                        <Button variant="destructive" onClick={handleLogout}>Log Out</Button>
                     </div>
                 </div>
               </CardContent>
