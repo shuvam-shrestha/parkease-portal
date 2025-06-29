@@ -49,17 +49,25 @@ export default function ParkingManagementPage() {
           </p>
         </div>
         
-        <Tabs defaultValue="details" className="max-w-4xl">
+        <Tabs defaultValue="details" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details">Parking Details</TabsTrigger>
             <TabsTrigger value="history">Update History</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="mt-6">
-            <ParkingDetailsForm
-              onSubmit={handleSaveChanges}
-              defaultValues={mockDefaultValues}
-              buttonText="Save Changes"
-            />
+            <Card>
+                <CardHeader>
+                    <CardTitle>Edit Parking Details</CardTitle>
+                    <CardDescription>Make changes to your parking space information below.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ParkingDetailsForm
+                      onSubmit={handleSaveChanges}
+                      defaultValues={mockDefaultValues}
+                      buttonText="Save Changes"
+                    />
+                </CardContent>
+            </Card>
           </TabsContent>
           <TabsContent value="history" className="mt-6">
             <Card>

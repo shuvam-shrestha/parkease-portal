@@ -12,12 +12,12 @@ import { AppSidebar } from '@/components/app-sidebar';
 export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen">
+      <div className="flex min-h-screen">
         <Sidebar>
           <AppSidebar />
           <SidebarRail />
         </Sidebar>
-        <SidebarInset>
+        <SidebarInset className="flex-grow">
           <div className="p-4 md:p-6">{children}</div>
         </SidebarInset>
       </div>

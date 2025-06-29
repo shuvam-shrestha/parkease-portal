@@ -11,12 +11,14 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,6 +28,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { userProfileSchema } from '@/lib/schemas';
 import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
 
 type UserProfileFormValues = z.infer<typeof userProfileSchema>;
 
@@ -67,72 +70,74 @@ export default function SettingsPage() {
           </p>
         </div>
         
-        <Card className="max-w-2xl">
-          <CardHeader>
-            <CardTitle>Profile</CardTitle>
-            <CardDescription>Update your personal information.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSaveChanges)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Your Name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your@email.com" {...field} readOnly disabled />
-                      </FormControl>
-                      <FormDescription>
-                        Your email address cannot be changed.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit">Save Changes</Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+        <div className="grid gap-8 md:grid-cols-1 max-w-2xl">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile</CardTitle>
+                <CardDescription>Update your personal information.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSaveChanges)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="your@email.com" {...field} readOnly disabled />
+                          </FormControl>
+                          <FormDescription>
+                            Your email address cannot be changed.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <Button type="submit">Save Changes</Button>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
 
-        <Card className="max-w-2xl">
-          <CardHeader>
-            <CardTitle>Security</CardTitle>
-            <CardDescription>Manage your password and session.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-             <div>
-                <Label>Password</Label>
-                <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground text-sm">For security, you can change your password.</p>
-                    <Button variant="outline">Change Password</Button>
+            <Card>
+              <CardHeader>
+                <CardTitle>Security</CardTitle>
+                <CardDescription>Manage your password and session.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                 <div>
+                    <Label className="font-semibold">Password</Label>
+                    <div className="flex items-center justify-between mt-2">
+                        <p className="text-muted-foreground text-sm">For security, you can change your password.</p>
+                        <Button variant="outline">Change Password</Button>
+                    </div>
                 </div>
-            </div>
-            <Separator />
-            <div>
-                <Label>Log Out</Label>
-                <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground text-sm">End your current session on this device.</p>
-                    <Button variant="destructive" onClick={handleLogout}>Log Out</Button>
+                <Separator />
+                <div>
+                    <Label className="font-semibold text-destructive">Log Out</Label>
+                    <div className="flex items-center justify-between mt-2">
+                        <p className="text-muted-foreground text-sm">End your current session on this device.</p>
+                        <Button variant="destructive" onClick={handleLogout}>Log Out</Button>
+                    </div>
                 </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+        </div>
       </div>
     </AppLayout>
   );

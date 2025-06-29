@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Bike, Car, Clock, LogIn, LogOut, TrendingUp, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bike, Car, Clock, LogIn, LogOut, TrendingUp } from 'lucide-react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +21,7 @@ import type { ChartConfig } from '@/components/ui/chart';
 const TWO_WHEELER_CAPACITY = 50;
 const FOUR_WHEELER_CAPACITY = 20;
 
-const analyticsData = {
+const initialAnalyticsData = {
   "7": [
     { date: "Mon", twoWheelers: 45, fourWheelers: 18 },
     { date: "Tue", twoWheelers: 48, fourWheelers: 19 },
@@ -31,8 +31,8 @@ const analyticsData = {
     { date: "Sat", twoWheelers: 35, fourWheelers: 12 },
     { date: "Sun", twoWheelers: 38, fourWheelers: 14 },
   ],
-  "15": Array.from({ length: 15 }, (_, i) => ({ date: `Day ${i + 1}`, twoWheelers: Math.floor(Math.random() * 20) + 30, fourWheelers: Math.floor(Math.random() * 10) + 10 })),
-  "30": Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, twoWheelers: Math.floor(Math.random() * 25) + 25, fourWheelers: Math.floor(Math.random() * 12) + 8 })),
+  "15": [],
+  "30": [],
 };
 
 const chartConfig = {
@@ -51,6 +51,23 @@ export default function DashboardPage() {
   const [twoWheelerSlots, setTwoWheelerSlots] = useState(12);
   const [fourWheelerSlots, setFourWheelerSlots] = useState(5);
   const [timeRange, setTimeRange] = useState<"7" | "15" | "30">("7");
+  const [analyticsData, setAnalyticsData] = useState(initialAnalyticsData);
+
+  useEffect(() => {
+    // Generate random data on the client side to avoid hydration mismatch
+    const generateData = (days: number) => 
+      Array.from({ length: days }, (_, i) => ({ 
+        date: `Day ${i + 1}`, 
+        twoWheelers: Math.floor(Math.random() * 20) + 30, 
+        fourWheelers: Math.floor(Math.random() * 10) + 10 
+      }));
+
+    setAnalyticsData(prevData => ({
+      ...prevData,
+      "15": generateData(15),
+      "30": generateData(30),
+    }));
+  }, []);
 
   const handleCheckIn = (type: '2w' | '4w') => {
     if (type === '2w') {
@@ -84,14 +101,14 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">Parking analytics and vehicle management.</p>
         </div>
 
-        <Tabs defaultValue="analytics">
+        <Tabs defaultValue="analytics" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:w-auto md:inline-flex">
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="management">Vehicle Management</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="flex items-center justify-between mt-6">
+          <TabsContent value="analytics" className="space-y-6 mt-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <h2 className="text-2xl font-bold font-headline">Performance Overview</h2>
               <Select value={timeRange} onValueChange={(value: "7" | "15" | "30") => setTimeRange(value)}>
                 <SelectTrigger className="w-[180px]">
@@ -182,10 +199,10 @@ export default function DashboardPage() {
                 </CardContent>
                 <CardFooter className="grid grid-cols-2 gap-4">
                   <Button size="lg" onClick={() => handleCheckIn('2w')}>
-                    <LogIn className="mr-2" /> Check In
+                    <LogIn className="mr-2 h-5 w-5" /> Check In
                   </Button>
                   <Button size="lg" variant="outline" onClick={() => handleCheckOut('2w')}>
-                    <LogOut className="mr-2" /> Check Out
+                    <LogOut className="mr-2 h-5 w-5" /> Check Out
                   </Button>
                 </CardFooter>
               </Card>
@@ -206,10 +223,10 @@ export default function DashboardPage() {
                 </CardContent>
                 <CardFooter className="grid grid-cols-2 gap-4">
                   <Button size="lg" onClick={() => handleCheckIn('4w')}>
-                    <LogIn className="mr-2" /> Check In
+                    <LogIn className="mr-2 h-5 w-5" /> Check In
                   </Button>
                   <Button size="lg" variant="outline" onClick={() => handleCheckOut('4w')}>
-                    <LogOut className="mr-2" /> Check Out
+                    <LogOut className="mr-2 h-5 w-5" /> Check Out
                   </Button>
                 </CardFooter>
               </Card>
