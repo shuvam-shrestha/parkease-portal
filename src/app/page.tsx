@@ -19,8 +19,7 @@ import { Logo } from '@/components/logo';
 export default function LoginPage() {
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = () => {
     router.push('/dashboard');
   };
 
@@ -36,7 +35,7 @@ export default function LoginPage() {
             <CardDescription>Sign in to manage your parking space</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" placeholder="owner@example.com" />
@@ -45,10 +44,10 @@ export default function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <Input id="password" type="password" />
               </div>
-              <Button type="submit" className="w-full !mt-6" style={{backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))'}}>
+              <Button type="button" onClick={handleLogin} className="w-full !mt-6" style={{backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))'}}>
                 Sign In
               </Button>
-            </form>
+            </div>
           </CardContent>
           <CardFooter className="flex-col">
             <p className="text-center text-sm text-muted-foreground">
