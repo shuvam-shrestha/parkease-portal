@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Building, Car, LayoutDashboard, LogOut, Settings } from 'lucide-react';
 
@@ -37,32 +38,38 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              href="/dashboard"
+              asChild
               isActive={pathname === '/dashboard'}
               tooltip="Dashboard"
             >
-              <LayoutDashboard />
-              <span>Dashboard</span>
+              <Link href="/dashboard">
+                <LayoutDashboard />
+                <span>Dashboard</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              href="/vehicle-management"
+              asChild
               isActive={pathname === '/vehicle-management'}
               tooltip="Vehicle Management"
             >
-              <Car />
-              <span>Vehicle Management</span>
+              <Link href="/vehicle-management">
+                <Car />
+                <span>Vehicle Management</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              href="/parking-management"
+              asChild
               isActive={pathname === '/parking-management'}
               tooltip="Parking Management"
             >
-              <Building />
-              <span>Parking Management</span>
+              <Link href="/parking-management">
+                <Building />
+                <span>Parking Management</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -72,12 +79,14 @@ export function AppSidebar() {
         <SidebarMenu>
            <SidebarMenuItem>
             <SidebarMenuButton
-              href="/settings"
+              asChild
               isActive={pathname === '/settings'}
               tooltip="Settings"
             >
-              <Settings />
-              <span>Settings</span>
+              <Link href="/settings">
+                <Settings />
+                <span>Settings</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
            <SidebarMenuItem>
