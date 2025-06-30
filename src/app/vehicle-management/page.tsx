@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Bike, Car, LogIn, LogOut } from 'lucide-react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
@@ -24,37 +23,46 @@ import { Input } from '@/components/ui/input';
 const TWO_WHEELER_CAPACITY = 50;
 const FOUR_WHEELER_CAPACITY = 20;
 
-const initialVehicleLog: {
+type VehicleLogEntry = {
   id: string;
   vehicleNumber: string;
   vehicleType: '2w' | '4w';
   status: 'Checked In' | 'Checked Out';
   timestamp: Date;
-}[] = [
-    { id: 'V1', vehicleNumber: 'BA 99 PA 1234', vehicleType: '2w', status: 'Checked In', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
-    { id: 'V2', vehicleNumber: 'KA 01 MA 5678', vehicleType: '4w', status: 'Checked In', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
-    { id: 'V3', vehicleNumber: 'GA 12 SA 4321', vehicleType: '2w', status: 'Checked Out', timestamp: new Date() },
-    { id: 'V4', vehicleNumber: 'BA 98 PA 5555', vehicleType: '2w', status: 'Checked In', timestamp: new Date() },
-    { id: 'V5', vehicleNumber: 'PR 01 CA 9999', vehicleType: '4w', status: 'Checked Out', timestamp: new Date() },
-    { id: 'V6', vehicleNumber: 'BA 99 PA 1111', vehicleType: '2w', status: 'Checked In', timestamp: new Date(new Date().setDate(new Date().getDate() - 2)) },
-    { id: 'V7', vehicleNumber: 'LU 01 TA 7777', vehicleType: '4w', status: 'Checked In', timestamp: new Date(new Date().setDate(new Date().getDate() - 3)) },
+  checkOutTimestamp?: Date;
+};
+
+const getInitialVehicleLog = (): VehicleLogEntry[] => [
+    { id: 'V1', vehicleNumber: 'BA 99 PA 1234', vehicleType: '2w', status: 'Checked In', timestamp: new Date(new Date().setHours(new Date().getHours() - 25)) },
+    { id: 'V2', vehicleNumber: 'KA 01 MA 5678', vehicleType: '4w', status: 'Checked In', timestamp: new Date(new Date().setHours(new Date().getHours() - 26)) },
+    { id: 'V3', vehicleNumber: 'GA 12 SA 4321', vehicleType: '2w', status: 'Checked Out', timestamp: new Date(new Date().setHours(new Date().getHours() - 5)), checkOutTimestamp: new Date(new Date().setHours(new Date().getHours() - 2)) },
+    { id: 'V4', vehicleNumber: 'BA 98 PA 5555', vehicleType: '2w', status: 'Checked In', timestamp: new Date(new Date().setHours(new Date().getHours() - 3)) },
+    { id: 'V5', vehicleNumber: 'PR 01 CA 9999', vehicleType: '4w', status: 'Checked Out', timestamp: new Date(new Date().setHours(new Date().getHours() - 8)), checkOutTimestamp: new Date(new Date().setHours(new Date().getHours() - 4)) },
+    { id: 'V6', vehicleNumber: 'BA 99 PA 1111', vehicleType: '2w', status: 'Checked In', timestamp: new Date(new Date().setHours(new Date().getHours() - 49)) },
+    { id: 'V7', vehicleNumber: 'LU 01 TA 7777', vehicleType: '4w', status: 'Checked In', timestamp: new Date(new Date().setHours(new Date().getHours() - 73)) },
 ];
 
 
 export default function VehicleManagementPage() {
   const { toast } = useToast();
   const [vehicleNumber, setVehicleNumber] = useState('');
-  const [vehicleLog, setVehicleLog] = useState(initialVehicleLog);
-
-  const [twoWheelerSlots, setTwoWheelerSlots] = useState(
-    initialVehicleLog.filter(v => v.vehicleType === '2w' && v.status === 'Checked In').length
-  );
-  const [fourWheelerSlots, setFourWheelerSlots] = useState(
-    initialVehicleLog.filter(v => v.vehicleType === '4w' && v.status === 'Checked In').length
-  );
+  const [vehicleLog, setVehicleLog] = useState<VehicleLogEntry[]>([]);
   
   const [filterDate, setFilterDate] = useState<Date | undefined>();
   const [filterVehicleType, setFilterVehicleType] = useState<'all' | '2w' | '4w'>('all');
+  
+  useEffect(() => {
+    setVehicleLog(getInitialVehicleLog());
+  }, []);
+
+  const twoWheelerSlots = useMemo(() => 
+    vehicleLog.filter(v => v.vehicleType === '2w' && v.status === 'Checked In').length, 
+    [vehicleLog]
+  );
+  const fourWheelerSlots = useMemo(() => 
+    vehicleLog.filter(v => v.vehicleType === '4w' && v.status === 'Checked In').length,
+    [vehicleLog]
+  );
 
   const handleCheckIn = (type: '2w' | '4w') => {
     const capacity = type === '2w' ? TWO_WHEELER_CAPACITY : FOUR_WHEELER_CAPACITY;
@@ -65,7 +73,7 @@ export default function VehicleManagementPage() {
       return;
     }
     
-    const newEntry = {
+    const newEntry: VehicleLogEntry = {
       id: new Date().toISOString(),
       vehicleNumber: vehicleNumber.toUpperCase(),
       vehicleType: type,
@@ -74,32 +82,25 @@ export default function VehicleManagementPage() {
     };
 
     setVehicleLog(prevLog => [newEntry, ...prevLog]);
-    if (type === '2w') setTwoWheelerSlots(prev => prev + 1);
-    else setFourWheelerSlots(prev => prev + 1);
-    
     setVehicleNumber('');
     toast({ title: 'Success', description: `${type === '2w' ? '2-wheeler' : '4-wheeler'} checked in.` });
   };
 
   const handleCheckOut = (type: '2w' | '4w') => {
-     const vehicleInLog = vehicleLog.find(v => v.vehicleNumber === vehicleNumber.toUpperCase() && v.status === 'Checked In');
+    const vehicleInLog = vehicleLog.find(v => v.vehicleNumber === vehicleNumber.toUpperCase() && v.status === 'Checked In');
 
     if (!vehicleInLog) {
       toast({ variant: 'destructive', title: 'Error', description: 'Vehicle not found or already checked out.' });
       return;
     }
     
-    const newEntry = {
-      id: new Date().toISOString(),
-      vehicleNumber: vehicleNumber.toUpperCase(),
-      vehicleType: type,
-      status: 'Checked Out' as const,
-      timestamp: new Date(),
-    };
-
-    setVehicleLog(prevLog => [newEntry, ...prevLog]);
-    if (type === '2w') setTwoWheelerSlots(prev => prev - 1);
-    else setFourWheelerSlots(prev => prev - 1);
+    setVehicleLog(prevLog => 
+      prevLog.map(v => 
+        v.id === vehicleInLog.id 
+          ? { ...v, status: 'Checked Out' as const, checkOutTimestamp: new Date() }
+          : v
+      )
+    );
 
     setVehicleNumber('');
     toast({ title: 'Success', description: `${type === '2w' ? '2-wheeler' : '4-wheeler'} checked out.` });
@@ -107,7 +108,7 @@ export default function VehicleManagementPage() {
 
   const filteredLog = useMemo(() => {
     return vehicleLog.filter(entry => {
-      const dateMatch = !filterDate || format(entry.timestamp, 'yyyy-MM-dd') === format(filterDate, 'yyyy-MM-dd');
+      const dateMatch = !filterDate || format(entry.timestamp, 'yyyy-MM-dd') === format(filterDate, 'yyyy-MM-dd') || (entry.checkOutTimestamp && format(entry.checkOutTimestamp, 'yyyy-MM-dd') === format(filterDate, 'yyyy-MM-dd'));
       const typeMatch = filterVehicleType === 'all' || entry.vehicleType === filterVehicleType;
       return dateMatch && typeMatch;
     });
@@ -212,8 +213,8 @@ export default function VehicleManagementPage() {
                             <TableHead>Vehicle No.</TableHead>
                             <TableHead>Type</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Time</TableHead>
+                            <TableHead>Check-in Time</TableHead>
+                            <TableHead>Check-out Time</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -227,8 +228,8 @@ export default function VehicleManagementPage() {
                                             {entry.status}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>{format(entry.timestamp, 'PPP')}</TableCell>
-                                    <TableCell>{format(entry.timestamp, 'p')}</TableCell>
+                                    <TableCell>{format(entry.timestamp, 'PPp')}</TableCell>
+                                    <TableCell>{entry.checkOutTimestamp ? format(entry.checkOutTimestamp, 'PPp') : 'N/A'}</TableCell>
                                 </TableRow>
                             ))
                         ) : (
