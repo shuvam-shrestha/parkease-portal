@@ -19,11 +19,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DatePicker } from '@/components/ui/date-picker';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { Input } from '@/components/ui/input';
 
 const TWO_WHEELER_CAPACITY = 50;
 const FOUR_WHEELER_CAPACITY = 20;
 
-const mockVehicleLog: {
+const initialVehicleLog: {
   id: string;
   vehicleNumber: string;
   vehicleType: '2w' | '4w';
@@ -42,47 +43,75 @@ const mockVehicleLog: {
 
 export default function VehicleManagementPage() {
   const { toast } = useToast();
-  const [twoWheelerSlots, setTwoWheelerSlots] = useState(12);
-  const [fourWheelerSlots, setFourWheelerSlots] = useState(5);
+  const [vehicleNumber, setVehicleNumber] = useState('');
+  const [vehicleLog, setVehicleLog] = useState(initialVehicleLog);
+
+  const [twoWheelerSlots, setTwoWheelerSlots] = useState(
+    initialVehicleLog.filter(v => v.vehicleType === '2w' && v.status === 'Checked In').length
+  );
+  const [fourWheelerSlots, setFourWheelerSlots] = useState(
+    initialVehicleLog.filter(v => v.vehicleType === '4w' && v.status === 'Checked In').length
+  );
   
   const [filterDate, setFilterDate] = useState<Date | undefined>();
   const [filterVehicleType, setFilterVehicleType] = useState<'all' | '2w' | '4w'>('all');
 
   const handleCheckIn = (type: '2w' | '4w') => {
-    if (type === '2w') {
-      if (twoWheelerSlots < TWO_WHEELER_CAPACITY) {
-        setTwoWheelerSlots(prev => prev + 1);
-        toast({ title: 'Success', description: '2-wheeler checked in.' });
-      } else {
-        toast({ variant: 'destructive', title: 'Error', description: 'No available slots for two-wheelers.' });
-      }
-    } else {
-      if (fourWheelerSlots < FOUR_WHEELER_CAPACITY) {
-        setFourWheelerSlots(prev => prev + 1);
-        toast({ title: 'Success', description: '4-wheeler checked in.' });
-      } else {
-        toast({ variant: 'destructive', title: 'Error', description: 'No available slots for four-wheelers.' });
-      }
+    const capacity = type === '2w' ? TWO_WHEELER_CAPACITY : FOUR_WHEELER_CAPACITY;
+    const currentSlots = type === '2w' ? twoWheelerSlots : fourWheelerSlots;
+    
+    if (currentSlots >= capacity) {
+      toast({ variant: 'destructive', title: 'Error', description: `No available slots for ${type === '2w' ? 'two-wheelers' : 'four-wheelers'}.` });
+      return;
     }
+    
+    const newEntry = {
+      id: new Date().toISOString(),
+      vehicleNumber: vehicleNumber.toUpperCase(),
+      vehicleType: type,
+      status: 'Checked In' as const,
+      timestamp: new Date(),
+    };
+
+    setVehicleLog(prevLog => [newEntry, ...prevLog]);
+    if (type === '2w') setTwoWheelerSlots(prev => prev + 1);
+    else setFourWheelerSlots(prev => prev + 1);
+    
+    setVehicleNumber('');
+    toast({ title: 'Success', description: `${type === '2w' ? '2-wheeler' : '4-wheeler'} checked in.` });
   };
 
   const handleCheckOut = (type: '2w' | '4w') => {
-    if (type === '2w' && twoWheelerSlots > 0) {
-      setTwoWheelerSlots(prev => prev - 1);
-       toast({ title: 'Success', description: '2-wheeler checked out.' });
-    } else if (type === '4w' && fourWheelerSlots > 0) {
-      setFourWheelerSlots(prev => prev - 1);
-       toast({ title: 'Success', description: '4-wheeler checked out.' });
+     const vehicleInLog = vehicleLog.find(v => v.vehicleNumber === vehicleNumber.toUpperCase() && v.status === 'Checked In');
+
+    if (!vehicleInLog) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Vehicle not found or already checked out.' });
+      return;
     }
+    
+    const newEntry = {
+      id: new Date().toISOString(),
+      vehicleNumber: vehicleNumber.toUpperCase(),
+      vehicleType: type,
+      status: 'Checked Out' as const,
+      timestamp: new Date(),
+    };
+
+    setVehicleLog(prevLog => [newEntry, ...prevLog]);
+    if (type === '2w') setTwoWheelerSlots(prev => prev - 1);
+    else setFourWheelerSlots(prev => prev - 1);
+
+    setVehicleNumber('');
+    toast({ title: 'Success', description: `${type === '2w' ? '2-wheeler' : '4-wheeler'} checked out.` });
   };
 
   const filteredLog = useMemo(() => {
-    return mockVehicleLog.filter(entry => {
+    return vehicleLog.filter(entry => {
       const dateMatch = !filterDate || format(entry.timestamp, 'yyyy-MM-dd') === format(filterDate, 'yyyy-MM-dd');
       const typeMatch = filterVehicleType === 'all' || entry.vehicleType === filterVehicleType;
       return dateMatch && typeMatch;
     });
-  }, [filterDate, filterVehicleType]);
+  }, [vehicleLog, filterDate, filterVehicleType]);
 
   return (
     <AppLayout>
@@ -91,6 +120,21 @@ export default function VehicleManagementPage() {
           <h1 className="text-3xl font-bold font-headline">Vehicle Management</h1>
           <p className="text-muted-foreground">Real-time vehicle check-in and check-out.</p>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Vehicle Entry</CardTitle>
+            <CardDescription>Enter a vehicle number below to enable check-in or check-out actions.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Input 
+              placeholder="e.g. BA 99 PA 1234" 
+              value={vehicleNumber} 
+              onChange={(e) => setVehicleNumber(e.target.value.toUpperCase())}
+              className="max-w-sm text-lg"
+            />
+          </CardContent>
+        </Card>
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="shadow-lg">
@@ -108,10 +152,10 @@ export default function VehicleManagementPage() {
                 <p className="text-sm text-muted-foreground">Occupied Slots</p>
             </CardContent>
             <CardFooter className="grid grid-cols-2 gap-4">
-              <Button size="lg" onClick={() => handleCheckIn('2w')}>
+              <Button size="lg" onClick={() => handleCheckIn('2w')} disabled={!vehicleNumber}>
                 <LogIn className="mr-2 h-5 w-5" /> Check In
               </Button>
-              <Button size="lg" variant="outline" onClick={() => handleCheckOut('2w')}>
+              <Button size="lg" variant="outline" onClick={() => handleCheckOut('2w')} disabled={!vehicleNumber}>
                 <LogOut className="mr-2 h-5 w-5" /> Check Out
               </Button>
             </CardFooter>
@@ -132,10 +176,10 @@ export default function VehicleManagementPage() {
               <p className="text-sm text-muted-foreground">Occupied Slots</p>
             </CardContent>
             <CardFooter className="grid grid-cols-2 gap-4">
-              <Button size="lg" onClick={() => handleCheckIn('4w')}>
+              <Button size="lg" onClick={() => handleCheckIn('4w')} disabled={!vehicleNumber}>
                 <LogIn className="mr-2 h-5 w-5" /> Check In
               </Button>
-              <Button size="lg" variant="outline" onClick={() => handleCheckOut('4w')}>
+              <Button size="lg" variant="outline" onClick={() => handleCheckOut('4w')} disabled={!vehicleNumber}>
                 <LogOut className="mr-2 h-5 w-5" /> Check Out
               </Button>
             </CardFooter>
