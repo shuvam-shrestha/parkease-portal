@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Building, Car, LayoutDashboard, LogOut, Settings } from 'lucide-react';
+import { Building, Car, CreditCard, LayoutDashboard, LogOut, Settings } from 'lucide-react';
 
 import {
   SidebarContent,
@@ -69,6 +69,18 @@ export function AppSidebar() {
               <Link href="/parking-management">
                 <Building />
                 <span>Parking Management</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === '/payment'}
+              tooltip="Payment"
+            >
+              <Link href="/payment">
+                <CreditCard />
+                <span>Payment</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
