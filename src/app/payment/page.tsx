@@ -11,8 +11,6 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Banknote } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 
 const paymentMethods = [
   {
@@ -41,15 +39,6 @@ const paymentMethods = [
   },
 ];
 
-const mockPaylogs = [
-    { id: 'TXN12345', date: '2024-07-21', method: 'Esewa', amount: 'NPR 150', status: 'Completed' },
-    { id: 'TXN12346', date: '2024-07-21', method: 'Khalti', amount: 'NPR 200', status: 'Completed' },
-    { id: 'TXN12347', date: '2024-07-21', method: 'Cash', amount: 'NPR 100', status: 'Completed' },
-    { id: 'TXN12348', date: '2024-07-20', method: 'Fonepay', amount: 'NPR 500', status: 'Completed' },
-    { id: 'TXN12349', date: '2024-07-20', method: 'IME Pay', amount: 'NPR 50', status: 'Pending' },
-    { id: 'TXN12350', date: '2024-07-19', method: 'Esewa', amount: 'NPR 300', status: 'Failed' },
-];
-
 export default function PaymentPage() {
   return (
     <AppLayout>
@@ -62,14 +51,13 @@ export default function PaymentPage() {
         </div>
 
         <Tabs defaultValue="esewa" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
             {paymentMethods.map((method) => (
               <TabsTrigger key={method.value} value={method.value}>
                 {method.name}
               </TabsTrigger>
             ))}
             <TabsTrigger value="cash">Cash</TabsTrigger>
-            <TabsTrigger value="paylogs">Paylogs</TabsTrigger>
           </TabsList>
 
           {paymentMethods.map((method) => (
@@ -123,43 +111,6 @@ export default function PaymentPage() {
                     Please collect the exact amount from the customer. Ensure you have sufficient change available. Record the transaction manually in your logs if necessary.
                  </p>
               </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="paylogs" className="mt-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Payment Logs</CardTitle>
-                    <CardDescription>A log of all recent transactions.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Transaction ID</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Method</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {mockPaylogs.map((log) => (
-                                <TableRow key={log.id}>
-                                    <TableCell className="font-medium">{log.id}</TableCell>
-                                    <TableCell>{log.date}</TableCell>
-                                    <TableCell>{log.method}</TableCell>
-                                    <TableCell>{log.amount}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={log.status === 'Completed' ? 'secondary' : log.status === 'Failed' ? 'destructive' : 'default'}>
-                                            {log.status}
-                                        </Badge>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
