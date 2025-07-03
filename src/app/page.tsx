@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleLogin = () => {
+    // This is a mock login. In a real app, you'd handle authentication here.
     router.push('/dashboard');
   };
 
@@ -52,7 +54,7 @@ export default function LoginPage() {
           <CardFooter className="flex-col">
             <p className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{' '}
-              <Link href="/onboarding/details" className="font-medium text-primary underline-offset-4 hover:underline">
+              <Link href="/onboarding/signup" className="font-medium text-primary underline-offset-4 hover:underline">
                 Collaborate with us
               </Link>
             </p>

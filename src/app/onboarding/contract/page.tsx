@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,7 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-const ONBOARDING_STORAGE_KEY = 'parkease-onboarding-data';
+const SIGNUP_STORAGE_KEY = 'parkease-signup-data';
+const PARKING_DETAILS_STORAGE_KEY = 'parkease-parking-details';
 
 export default function OnboardingContractPage() {
   const router = useRouter();
@@ -24,19 +26,24 @@ export default function OnboardingContractPage() {
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
-        const savedData = localStorage.getItem(ONBOARDING_STORAGE_KEY);
-        if (savedData) {
-          const parsedData = JSON.parse(savedData);
+        const signupDataJSON = localStorage.getItem(SIGNUP_STORAGE_KEY);
+        const parkingDataJSON = localStorage.getItem(PARKING_DETAILS_STORAGE_KEY);
+
+        if (signupDataJSON && parkingDataJSON) {
+          const signupData = JSON.parse(signupDataJSON);
+          const parkingData = JSON.parse(parkingDataJSON);
+          
           setFormData({
-            parkingSpaceName: parsedData.name,
-            ownerName: 'New Partner', // Placeholder name
-            location: parsedData.location,
-            facilities: parsedData.facilities,
-            amenities: parsedData.amenities,
+            parkingSpaceName: parkingData.name,
+            ownerName: signupData.name || 'New Partner',
+            location: parkingData.location,
+            facilities: parkingData.facilities,
+            amenities: parkingData.amenities,
             termsAndConditions: 'Standard collaboration terms apply.', // Placeholder
           });
         } else {
-          router.push('/onboarding/details');
+          // If data is missing, send them back to the appropriate step
+          router.push(parkingDataJSON ? '/onboarding/signup' : '/onboarding/details');
         }
       }
     } catch (error) {
@@ -64,11 +71,12 @@ export default function OnboardingContractPage() {
   
   const handleFinishOnboarding = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+      localStorage.removeItem(SIGNUP_STORAGE_KEY);
+      localStorage.removeItem(PARKING_DETAILS_STORAGE_KEY);
     }
     toast({
       title: 'Welcome to ParkEase!',
-      description: 'Your onboarding is complete. You are now being redirected to your dashboard.',
+      description: 'Onboarding successful. A confirmation has been sent to your email. Redirecting to dashboard...',
     });
     router.push('/dashboard');
   };
@@ -76,7 +84,7 @@ export default function OnboardingContractPage() {
   return (
     <div className="w-full max-w-4xl space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold font-headline">Final Step: Collaboration Agreement</h1>
+        <h1 className="text-3xl font-bold font-headline">Step 3: Collaboration Agreement</h1>
         <p className="text-muted-foreground">
           Please generate and review the standard contract based on your provided details.
         </p>
